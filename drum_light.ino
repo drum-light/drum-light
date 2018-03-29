@@ -1,4 +1,5 @@
 #include <Adafruit_NeoPixel.h>
+#include <float.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
@@ -78,7 +79,7 @@ void loop()
 
     if (drum1LightGoal > 0 && !movingUp) {
         drum1LightGoal--;
-      }
+    }
 
     
     
