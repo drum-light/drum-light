@@ -1,6 +1,6 @@
 // CS Final Project
 // Anna Little ael35
-// Tyler Luce (kirbyfreak@gmail.com)
+// Tyler Luce (kirby_freak@mac.com)
 
 #include <Adafruit_NeoPixel.h>
 #include <float.h>
@@ -249,7 +249,7 @@ void loop() {
 }
 
 /* functions */
-// Turns on this many lights from the bottom insantly
+// Turns on this many lights from the bottom instantly
 void turnLightsOnFromBottom(char c, uint32_t numToTurnOn, int currentAmountOn, Adafruit_NeoPixel* strip) {
 //  Serial.println("turning on");
 
@@ -304,7 +304,7 @@ void turnLightsOffFromTop(uint32_t numToTurnOff, int currentAmountOn, Adafruit_N
   strip->show();
 }
 
-/* turns entire strip on a specifc color and highest brightness */
+/* turns entire strip on a specific color and highest brightness */
 void turnStripOn(char c, int numLEDs, Adafruit_NeoPixel* strip){
   for (uint16_t i=0; i > numLEDs; i++) {
     switch(c){
