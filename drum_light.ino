@@ -103,37 +103,6 @@ void loop() {
   logicLoop(&crashLS, crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, threshold, CRASH_STRIP);
   logicLoop(&bassLS, bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, threshold, BASS_STRIP);
 
-  //sensing if bass was hit and adding lights for intensity of signal
-  if (bassADC > threshold && bassADC > bassPrev && (bassADC - bassPrev) > threshold) {
-    // print voltage
-    Serial.println(bassADC);
-    bassGoal += 1;
-    if (bassGoal > BASS_STRIP) {
-      bassGoal = BASS_STRIP;
-    }
-  }
-
-  bassPrev = bassADC;
-
-  if (currentMillis - bassPrevMillis > interval) {
-    bassPrevMillis = currentMillis;
-    bool movingUp = false;
-
-    if (bassCurrent < bassGoal) {
-      turnLightsOnFromBottom('w', 1, bassCurrent, &bassLS); // Tyler defined
-      bassCurrent += 1;
-      movingUp = true;
-    } else if (bassCurrent > bassGoal){
-      turnLightsOffFromTop(1, bassCurrent, &bassLS); // Tyler defined
-      bassCurrent -= 1;
-    }
-
-    if (bassGoal > 0 && !movingUp){
-      bassGoal--;
-    }
-  }
-}
-
 /* functions */
 
 // Logic loop for a drum/strip pair
