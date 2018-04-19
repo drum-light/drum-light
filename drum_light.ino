@@ -71,7 +71,7 @@ Adafruit_NeoPixel crashLS = Adafruit_NeoPixel(CRASH_STRIP, LED5, NEO_RGBW);
 unsigned long crashPrevMillis = 0; // last time update
 
 unsigned int interval = 20;
-unsigned int threshhold = 50;
+unsigned int threshold = 50;
 
 void setup() {
   Serial.begin(9600);
@@ -97,128 +97,14 @@ void loop() {
   bassADC = analogRead(BASS);
   crashADC = analogRead(CRASH);
 
-  //sensing if snare was hit and adding lights for intensity of signal
-  if (snareADC > threshhold && snareADC > snarePrev && (snareADC - snarePrev) > threshhold) {
-    // print voltage
-    Serial.println(snareADC);
-    snareGoal += 1;
-    if (snareGoal > SNARE_STRIP) {
-      snareGoal = SNARE_STRIP;
-    }
-  }
-
-  snarePrev = snareADC;
-
-  if (currentMillis - snarePrevMillis > interval) {
-    snarePrevMillis = currentMillis;
-    bool movingUp = false;
-
-    if (snareCurrent < snareGoal) {
-      turnLightsOnFromBottom('r', 1, snareCurrent, &snareLS); // Tyler defined
-      snareCurrent += 1;
-      movingUp = true;
-    } else if (snareCurrent > snareGoal){
-      turnLightsOffFromTop(1, snareCurrent, &snareLS); // Tyler defined
-      snareCurrent -= 1;
-    }
-
-    if (snareGoal > 0 && !movingUp){
-      snareGoal--;
-    }
-  }
-
-  //sensing if tom1 was hit and adding lights for intensity of signal
-  if (tom1ADC > threshhold && tom1ADC > tom1Prev && (tom1ADC - tom1Prev) > threshhold) {
-    // print voltage
-    Serial.println(tom1ADC);
-    tom1Goal += 1;
-    if (tom1Goal > TOM1_STRIP) {
-      tom1Goal = TOM1_STRIP;
-    }
-  }
-
-  tom1Prev = tom1ADC;
-
-  if (currentMillis - tom1PrevMillis > interval) {
-    tom1PrevMillis = currentMillis;
-    bool movingUp = false;
-
-    if (tom1Current < tom1Goal) {
-      turnLightsOnFromBottom('g', 1, tom1Current, &tom1LS); // Tyler defined
-      tom1Current += 1;
-      movingUp = true;
-    } else if (tom1Current > tom1Goal){
-      turnLightsOffFromTop(1, tom1Current, &tom1LS); // Tyler defined
-      tom1Current -= 1;
-    }
-
-    if (tom1Goal > 0 && !movingUp){
-      tom1Goal--;
-    }
-  }
-
-  //sensing if tom2 was hit and adding lights for intensity of signal
-  if (tom2ADC > 30 && tom2ADC > tom2Prev && (tom2ADC - tom2Prev) > threshhold) {
-    // print voltage
-    Serial.println(tom2ADC);
-    tom2Goal += 1;
-    if (tom2Goal > TOM2_STRIP) {
-      tom2Goal = TOM2_STRIP;
-    }
-  }
-
-  tom2Prev = tom2ADC;
-
-  if (currentMillis - tom2PrevMillis > interval) {
-    tom2PrevMillis = currentMillis;
-    bool movingUp = false;
-
-    if (tom2Current < tom2Goal) {
-      turnLightsOnFromBottom('r', 1, tom2Current, &tom2LS); // Tyler defined
-      tom2Current += 1;
-      movingUp = true;
-    } else if (tom2Current > tom2Goal){
-      turnLightsOffFromTop(1, tom2Current, &tom2LS); // Tyler defined
-      tom2Current -= 1;
-    }
-
-    if (tom2Goal > 0 && !movingUp){
-      tom2Goal--;
-    }
-  }
-
-  //sensing if crash was hit and adding lights for intensity of signal
-  if (crashADC > (threshhold + 10) && crashADC > crashPrev && (crashADC - crashPrev) > (threshhold + 10)) {
-    // print voltage
-    Serial.println(crashADC);
-    crashGoal += 1;
-    if (crashGoal > CRASH_STRIP) {
-      crashGoal = CRASH_STRIP;
-    }
-  }
-
-  crashPrev = crashADC;
-
-  if (currentMillis - crashPrevMillis > interval) {
-    crashPrevMillis = currentMillis;
-    bool movingUp = false;
-
-    if (crashCurrent < crashGoal) {
-      turnLightsOnFromBottom('b', 1, crashCurrent, &crashLS); // Tyler defined
-      crashCurrent += 1;
-      movingUp = true;
-    } else if (crashCurrent > crashGoal){
-      turnLightsOffFromTop(1, crashCurrent, &crashLS); // Tyler defined
-      crashCurrent -= 1;
-    }
-
-    if (crashGoal > 0 && !movingUp){
-      crashGoal--;
-    }
-  }
+  logicLoop(&snareLS, snareGoal, snareCurrent, snarePrev, currentMillis, snarePrevMillis, snareADC, threshold, SNARE_STRIP);
+  logicLoop(&tom1LS, tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, threshold, TOM1_STRIP);
+  logicLoop(&tom2LS, tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, threshold, TOM2_STRIP);
+  logicLoop(&crashLS, crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, threshold, CRASH_STRIP);
+  logicLoop(&bassLS, bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, threshold, BASS_STRIP);
 
   //sensing if bass was hit and adding lights for intensity of signal
-  if (bassADC > threshhold && bassADC > bassPrev && (bassADC - bassPrev) > threshhold) {
+  if (bassADC > threshold && bassADC > bassPrev && (bassADC - bassPrev) > threshold) {
     // print voltage
     Serial.println(bassADC);
     bassGoal += 1;
@@ -249,6 +135,40 @@ void loop() {
 }
 
 /* functions */
+
+// Logic loop for a drum/strip pair
+void logicLoop(Adafruit_NeoPixel* strip, int &goal, int &current, int &prev, unsigned long &currentMillis, unsigned long &prevMillis, int &adc, unsigned int &threshold, int stripLedCount) {
+  //sensing if the drum was hit and adding lights for intensity of signal
+  if (adc > threshold && ADC > prev && (adc - prev) > threshold) {
+    // print voltage
+    Serial.println(ADC);
+    goal += 1;
+    if (goal > stripLedCount) {
+      goal = stripLedCount;
+    }
+  }
+
+  prev = adc;
+
+  if (currentMillis - prevMillis > interval) {
+    prevMillis = currentMillis;
+    bool movingUp = false;
+
+    if (current < goal) {
+      turnLightsOnFromBottom('r', 1, current, strip); // Tyler defined
+      current += 1;
+      movingUp = true;
+    } else if (current > goal){
+      turnLightsOffFromTop(1, current, strip); // Tyler defined
+      current -= 1;
+    }
+
+    if (goal > 0 && !movingUp){
+      (goal)--;
+    }
+  }
+}
+
 // Turns on this many lights from the bottom instantly
 void turnLightsOnFromBottom(char c, uint32_t numToTurnOn, int currentAmountOn, Adafruit_NeoPixel* strip) {
 //  Serial.println("turning on");
