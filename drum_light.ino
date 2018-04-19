@@ -35,6 +35,7 @@ int snareCurrent = 0; // current number of LEDs on
 int snareGoal = 0; // goal of how many to light up
 int snareADC = 0; // reading from sensor
 int snarePrev = 0;  // previous reading
+unsigned int snareThreshold = 50;
 Adafruit_NeoPixel snareLS = Adafruit_NeoPixel(SNARE_STRIP, LED1, NEO_RGBW); // LED strip associated w the snare
 unsigned long snarePrevMillis = 0; // last time update
 
@@ -43,6 +44,7 @@ int tom1Current = 0;
 int tom1Goal = 0;
 int tom1ADC = 0;
 int tom1Prev = 0;
+unsigned int tom1Threshold = 50;
 Adafruit_NeoPixel tom1LS = Adafruit_NeoPixel(TOM1_STRIP, LED2, NEO_RGBW);
 unsigned long tom1PrevMillis = 0; // last time update
 
@@ -51,6 +53,7 @@ int tom2Current = 0;
 int tom2Goal = 0;
 int tom2ADC = 0;
 int tom2Prev = 0;
+unsigned int tom2Threshold = 50;
 Adafruit_NeoPixel tom2LS = Adafruit_NeoPixel(TOM2_STRIP, LED3, NEO_RGBW);
 unsigned long tom2PrevMillis = 0; // last time update
 
@@ -59,6 +62,7 @@ int bassCurrent = 0;
 int bassGoal = 0;
 int bassADC = 0;
 int bassPrev = 0;
+unsigned int bassThreshold = 50;
 Adafruit_NeoPixel bassLS = Adafruit_NeoPixel(BASS_STRIP, LED4, NEO_RGBW);
 unsigned long bassPrevMillis = 0; // last time update
 
@@ -67,6 +71,7 @@ int crashCurrent = 0;
 int crashGoal = 0;
 int crashADC = 0;
 int crashPrev = 0;
+unsigned int crashThreshold = 60;
 Adafruit_NeoPixel crashLS = Adafruit_NeoPixel(CRASH_STRIP, LED5, NEO_RGBW);
 unsigned long crashPrevMillis = 0; // last time update
 
@@ -97,17 +102,17 @@ void loop() {
   bassADC = analogRead(BASS);
   crashADC = analogRead(CRASH);
 
-  logicLoop(&snareLS, 'r', snareGoal, snareCurrent, snarePrev, currentMillis, snarePrevMillis, snareADC, threshold, SNARE_STRIP);
-  logicLoop(&tom1LS, 'r', tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, threshold, TOM1_STRIP);
-  logicLoop(&tom2LS, 'r', tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, threshold, TOM2_STRIP);
-  logicLoop(&crashLS, 'r', crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, threshold, CRASH_STRIP);
-  logicLoop(&bassLS, 'r', bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, threshold, BASS_STRIP);
+  basicDrumLogic(&snareLS, 'r', snareGoal, snareCurrent, snarePrev, currentMillis, snarePrevMillis, snareADC, snareThreshold, SNARE_STRIP);
+  basicDrumLogic(&tom1LS, 'r', tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, tom1Threshold, TOM1_STRIP);
+  basicDrumLogic(&tom2LS, 'r', tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, tom2Threshold, TOM2_STRIP);
+  basicDrumLogic(&crashLS, 'r', crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, crashThreshold, CRASH_STRIP);
+  basicDrumLogic(&bassLS, 'r', bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, bassThreshold, BASS_STRIP);
 
 }
 /* functions */
 
 // Logic loop for a drum/strip pair
-void logicLoop(Adafruit_NeoPixel* strip, char color, int &goal, int &current, int &prev, unsigned long &currentMillis, unsigned long &prevMillis, int &adc, unsigned int &threshold, int stripLedCount) {
+void basicDrumLogic(Adafruit_NeoPixel* strip, char color, int &goal, int &current, int &prev, unsigned long &currentMillis, unsigned long &prevMillis, int &adc, unsigned int &threshold, int stripLedCount) {
   //sensing if the drum was hit and adding lights for intensity of signal
   if (adc > threshold && ADC > prev && (adc - prev) > threshold) {
     // print voltage
