@@ -234,11 +234,11 @@ void loop() {
     bool movingUp = false;
 
     if (bassCurrent < bassGoal) {
-      turnLightsOnFromBottom(1, bassCurrent, &bassLS); // Tyler defined
+      turnLightsOnFromBottom('w', 1, bassCurrent, &bassLS); // Tyler defined
       bassCurrent += 1;
       movingUp = true;
     } else if (bassCurrent > bassGoal){
-      turnLightsOffFromTop('w', 1, bassCurrent, &bassLS); // Tyler defined
+      turnLightsOffFromTop(1, bassCurrent, &bassLS); // Tyler defined
       bassCurrent -= 1;
     }
 
