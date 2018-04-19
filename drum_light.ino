@@ -103,6 +103,7 @@ void loop() {
   logicLoop(&crashLS, crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, threshold, CRASH_STRIP);
   logicLoop(&bassLS, bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, threshold, BASS_STRIP);
 
+}
 /* functions */
 
 // Logic loop for a drum/strip pair
