@@ -97,17 +97,17 @@ void loop() {
   bassADC = analogRead(BASS);
   crashADC = analogRead(CRASH);
 
-  logicLoop(&snareLS, snareGoal, snareCurrent, snarePrev, currentMillis, snarePrevMillis, snareADC, threshold, SNARE_STRIP);
-  logicLoop(&tom1LS, tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, threshold, TOM1_STRIP);
-  logicLoop(&tom2LS, tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, threshold, TOM2_STRIP);
-  logicLoop(&crashLS, crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, threshold, CRASH_STRIP);
-  logicLoop(&bassLS, bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, threshold, BASS_STRIP);
+  logicLoop(&snareLS, 'r', snareGoal, snareCurrent, snarePrev, currentMillis, snarePrevMillis, snareADC, threshold, SNARE_STRIP);
+  logicLoop(&tom1LS, 'r', tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, threshold, TOM1_STRIP);
+  logicLoop(&tom2LS, 'r', tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, threshold, TOM2_STRIP);
+  logicLoop(&crashLS, 'r', crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, threshold, CRASH_STRIP);
+  logicLoop(&bassLS, 'r', bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, threshold, BASS_STRIP);
 
 }
 /* functions */
 
 // Logic loop for a drum/strip pair
-void logicLoop(Adafruit_NeoPixel* strip, int &goal, int &current, int &prev, unsigned long &currentMillis, unsigned long &prevMillis, int &adc, unsigned int &threshold, int stripLedCount) {
+void logicLoop(Adafruit_NeoPixel* strip, char color, int &goal, int &current, int &prev, unsigned long &currentMillis, unsigned long &prevMillis, int &adc, unsigned int &threshold, int stripLedCount) {
   //sensing if the drum was hit and adding lights for intensity of signal
   if (adc > threshold && ADC > prev && (adc - prev) > threshold) {
     // print voltage
@@ -125,7 +125,7 @@ void logicLoop(Adafruit_NeoPixel* strip, int &goal, int &current, int &prev, uns
     bool movingUp = false;
 
     if (current < goal) {
-      turnLightsOnFromBottom('r', 1, current, strip); // Tyler defined
+      turnLightsOnFromBottom(color, 1, current, strip); // Tyler defined
       current += 1;
       movingUp = true;
     } else if (current > goal){
