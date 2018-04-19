@@ -103,20 +103,20 @@ void loop() {
   crashADC = analogRead(CRASH);
 
   basicDrumLogic(&snareLS, 'r', snareGoal, snareCurrent, snarePrev, currentMillis, snarePrevMillis, snareADC, snareThreshold, SNARE_STRIP);
-  basicDrumLogic(&tom1LS, 'r', tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, tom1Threshold, TOM1_STRIP);
-  basicDrumLogic(&tom2LS, 'r', tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, tom2Threshold, TOM2_STRIP);
+  basicDrumLogic(&tom1LS, 'b', tom1Goal, tom1Current, tom1Prev, currentMillis, tom1PrevMillis, tom1ADC, tom1Threshold, TOM1_STRIP);
+  basicDrumLogic(&tom2LS, 'g', tom2Goal, tom2Current, tom2Prev, currentMillis, tom2PrevMillis, tom2ADC, tom2Threshold, TOM2_STRIP);
   basicDrumLogic(&crashLS, 'r', crashGoal, crashCurrent, crashPrev, currentMillis, crashPrevMillis, crashADC, crashThreshold, CRASH_STRIP);
-  basicDrumLogic(&bassLS, 'r', bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, bassThreshold, BASS_STRIP);
+  basicDrumLogic(&bassLS, 'w', bassGoal, bassCurrent, bassPrev, currentMillis, bassPrevMillis, bassADC, bassThreshold, BASS_STRIP);
 
 }
 /* functions */
 
 // Logic loop for a drum/strip pair
-void basicDrumLogic(Adafruit_NeoPixel* strip, char color, int &goal, int &current, int &prev, unsigned long &currentMillis, unsigned long &prevMillis, int &adc, unsigned int &threshold, int stripLedCount) {
+void basicDrumLogic(Adafruit_NeoPixel* strip, char color, int &goal, int &current, int &prev, unsigned long currentMillis, unsigned long &prevMillis, int &adc, unsigned int threshold, int stripLedCount) {
   //sensing if the drum was hit and adding lights for intensity of signal
-  if (adc > threshold && ADC > prev && (adc - prev) > threshold) {
+  if (adc > threshold && adc > prev && (adc - prev) > threshold) {
     // print voltage
-    Serial.println(ADC);
+    Serial.println(adc);
     goal += 1;
     if (goal > stripLedCount) {
       goal = stripLedCount;
@@ -162,12 +162,16 @@ for (uint16_t i=currentAmountOn; i<=goal; i++) {
   switch(c){
     case 'r':
       strip->setPixelColor(i, strip->Color(0, 255, 0, 10));
+      break;
     case 'g':
       strip->setPixelColor(i, strip->Color(255, 0, 0, 0));
+      break;
     case 'b':
       strip->setPixelColor(i, strip->Color(0, 0, 255, 0));
+      break;
     case 'w':
       strip->setPixelColor(i, strip->Color(0, 0, 0, 255));
+      break;
   }
 }
 strip->show();
